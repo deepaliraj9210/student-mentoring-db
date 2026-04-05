@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Student Mentoring Records DB</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
+
+    :root {
+      --bg: #0d0f1a;
+      --surface: #13162a;
+      --surface2: #1a1e35;
+      --border: #252a45;
+      --accent: #6c63ff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --red: #f87171;
+      --yellow: #fbbf24;
+      --blue: #60a5fa;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --card: #161929;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, #1a1e35 0%, #13162a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px)
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px
+    }
+
+    .logo h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text)
+    }
+
+    .logo p {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 1px
+    }
+
+    .header-badges {
+      margin-left: auto;
+      display: flex;
+      gap: 8px
+    }
+
+    .badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .3px
+    }
+
+    .badge-green {
+      background: rgba(52, 211, 153, .15);
+      color: var(--green);
+      border: 1px solid rgba(52, 211, 153, .3)
+    }
+
+    .badge-purple {
+      background: rgba(108, 99, 255, .15);
+      color: var(--accent2);
+      border: 1px solid rgba(108, 99, 255, .3)
+    }
+
+    /* LAYOUT */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      height: calc(100vh - 65px)
+    }
+
+    /* SIDEBAR */
+    aside {
+      width: 220px;
+      min-width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 16px 0
+    }
+
+    .nav-group {
+      margin-bottom: 8px
+    }
+
+    .nav-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      padding: 8px 18px 4px;
+      text-transform: uppercase
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 18px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #94a3b8;
+      transition: all .2s;
+      border-left: 3px solid transparent;
+      margin: 1px 0
+    }
+
+    .nav-item:hover {
+      background: rgba(108, 99, 255, .08);
+      color: var(--text)
+    }
+
+    .nav-item.active {
+      background: rgba(108, 99, 255, .12);
+      color: var(--accent2);
+      border-left-color: var(--accent)
+    }
+
+    .nav-item .icon {
+      width: 18px;
+      text-align: center;
+      font-size: 14px
+    }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      background: var(--bg)
+    }
+
+    /* TABS */
+    .tab-panels>div {
+      display: none
+    }
+
+    .tab-panels>div.active {
+      display: block
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px
+    }
+
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      transition: .2s
+    }
+
+    .stat:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px)
+    }
+
+    .stat-num {
+      font-size: 28px;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--border)
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px
+    }
+
+    thead tr {
+      background: var(--surface2)
+    }
+
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      white-space: nowrap
+    }
+
+    td {
+      padding: 9px 14px;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    tr:hover td {
+      background: rgba(108, 99, 255, .05)
+    }
+
+    /* QUERY EDITOR */
+    .query-editor {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 14px
+    }
+
+    .query-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2)
+    }
+
+    .query-toolbar span {
+      font-size: 12px;
+      color: var(--muted);
+      flex: 1
+    }
+
+    textarea#sql-input {
+      width: 100%;
+      background: var(--surface);
+      color: #a78bfa;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      border: none;
+      outline: none;
+      resize: vertical;
+      padding: 16px;
+      min-height: 120px;
+      line-height: 1.6
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff
+    }
+
+    .btn-primary:hover {
+      opacity: .88;
+      transform: translateY(-1px)
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--accent2);
+      border: 1px solid var(--border)
+    }
+
+    .btn-outline:hover {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, .08)
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 12px;
+      border-radius: 6px
+    }
+
+    /* PRESET QUERIES */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px
+    }
+
+    .preset-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      padding: 10px 14px;
+      cursor: pointer;
+      text-align: left;
+      transition: .2s
+    }
+
+    .preset-btn:hover {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, .07)
+    }
+
+    .preset-btn .preset-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent2);
+      margin-bottom: 3px
+    }
+
+    .preset-btn .preset-desc {
+      font-size: 11px;
+      color: var(--muted)
+    }
+
+    /* RESULT */
+    #result-area {
+      margin-top: 14px
+    }
+
+    .result-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px
+    }
+
+    .result-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600
+    }
+
+    .result-ok {
+      background: rgba(52, 211, 153, .15);
+      color: var(--green);
+      border: 1px solid rgba(52, 211, 153, .3)
+    }
+
+    .result-err {
+      background: rgba(248, 113, 113, .15);
+      color: var(--red);
+      border: 1px solid rgba(248, 113, 113, .3)
+    }
+
+    /* PILL TAGS */
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600
+    }
+
+    .pill-green {
+      background: rgba(52, 211, 153, .15);
+      color: var(--green)
+    }
+
+    .pill-red {
+      background: rgba(248, 113, 113, .2);
+      color: var(--red)
+    }
+
+    .pill-yellow {
+      background: rgba(251, 191, 36, .15);
+      color: var(--yellow)
+    }
+
+    .pill-blue {
+      background: rgba(96, 165, 250, .15);
+      color: var(--blue)
+    }
+
+    .pill-purple {
+      background: rgba(167, 139, 250, .15);
+      color: var(--accent2)
+    }
+
+    /* SCHEMA BOX */
+    .schema-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #a78bfa;
+      line-height: 1.7;
+      overflow-x: auto;
+      white-space: pre
+    }
+
+    /* STATUS BAR */
+    #status {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 6px 20px;
+      font-size: 11px;
+      color: var(--muted);
+      display: flex;
+      gap: 20px
+    }
+
+    .status-dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 5px
+    }
+
+    /* LOADING */
+    #loading {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    /* SECTION TITLES */
+    .section-header {
+      margin-bottom: 18px
+    }
+
+    .section-header h2 {
+      font-size: 20px;
+      font-weight: 700
+    }
+
+    .section-header p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px
+    }
+
+    /* RA BOX */
+    .ra-box {
+      background: #0a0c18;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #67e8f9;
+      line-height: 1.8;
+      overflow-x: auto;
+      white-space: pre
+    }
+
+    /* COMPARE TABLE */
+    .compare-table th {
+      background: var(--surface2);
+      color: var(--accent2)
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surface)
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent)
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <p style="color:var(--muted);font-size:14px">Loading database engine…</p>
+  </div>
+
+  <header>
+    <div class="logo">
+      <div class="logo-icon">🎓</div>
+      <div>
+        <h1>Student Mentoring Records DB</h1>
+        <p>University Mini DBMS Project — SQLite In-Browser</p>
+      </div>
+    </div>
+    <div class="header-badges">
+      <span class="badge badge-green">● DB Ready</span>
+      <span class="badge badge-purple">5 Phases</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="nav-group">
+        <div class="nav-label">Overview</div>
+        <div class="nav-item active" onclick="showTab('dashboard',this)"><span class="icon">📊</span> Dashboard</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Data Explorer</div>
+        <div class="nav-item" onclick="showTab('tab-users',this)"><span class="icon">👥</span> Users</div>
+        <div class="nav-item" onclick="showTab('tab-mentors',this)"><span class="icon">🧑‍🏫</span> Mentors</div>
+        <div class="nav-item" onclick="showTab('tab-mentees',this)"><span class="icon">🎓</span> Mentees</div>
+        <div class="nav-item" onclick="showTab('tab-sessions',this)"><span class="icon">📅</span> Sessions</div>
+        <div class="nav-item" onclick="showTab('tab-notes',this)"><span class="icon">🔐</span> SensitiveNotes</div>
+        <div class="nav-item" onclick="showTab('tab-ec',this)"><span class="icon">📞</span> Emergency Contacts</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Queries</div>
+        <div class="nav-item" onclick="showTab('tab-queries',this)"><span class="icon">⚡</span> Run Queries</div>
+        <div class="nav-item" onclick="showTab('tab-algebra',this)"><span class="icon">∑</span> Relational Algebra</div>
+      </div>
+      <div class="nav-group">
+        <div class="nav-label">Theory</div>
+        <div class="nav-item" onclick="showTab('tab-schema',this)"><span class="icon">🗂</span> Schema</div>
+        <div class="nav-item" onclick="showTab('tab-norm',this)"><span class="icon">✅</span> Normalization</div>
+        <div class="nav-item" onclick="showTab('tab-acid',this)"><span class="icon">🔒</span> ACID & Concurrency</div>
+      </div>
+    </aside>
+
+    <main>
+      <div class="tab-panels">
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="active">
+          <div class="section-header">
+            <h2>📊 Database Dashboard</h2>
+            <p>Live statistics from the in-browser SQLite database.</p>
+          </div>
+          <div class="stats" id="stats-row"></div>
+          <div class="card">
+            <div class="card-title">🔗 Entity Relationship Overview</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;font-size:12.5px;color:var(--muted)">
+              <div style="background:var(--surface2);border-radius:9px;padding:14px">
+                <div style="font-weight:700;color:var(--accent2);margin-bottom:8px">Supertype</div>
+                <div style="color:var(--text)">👤 Users</div>
+                <div style="margin-top:6px;font-size:11px">Stores all system users.<br>Role: Mentor / Mentee / Admin
+                </div>
+              </div>
+              <div style="background:var(--surface2);border-radius:9px;padding:14px">
+                <div style="font-weight:700;color:var(--accent2);margin-bottom:8px">Subtypes (IS-A)</div>
+                <div style="color:var(--text)">🧑‍🏫 Mentors &nbsp;|&nbsp; 🎓 Mentees</div>
+                <div style="margin-top:6px;font-size:11px">Generalization / Specialization.<br>Table-Per-Subclass
+                  mapping.</div>
+              </div>
+              <div style="background:var(--surface2);border-radius:9px;padding:14px">
+                <div style="font-weight:700;color:var(--accent2);margin-bottom:8px">Weak Entity</div>
+                <div style="color:var(--text)">📞 EmergencyContacts</div>
+                <div style="margin-top:6px;font-size:11px">Composite PK (ContactID, MenteeID).<br>Depends on Mentee for
+                  existence.</div>
+              </div>
+              <div style="background:var(--surface2);border-radius:9px;padding:14px">
+                <div style="font-weight:700;color:var(--accent2);margin-bottom:8px">M:N Resolution</div>
+                <div style="color:var(--text)">📅 Sessions</div>
+                <div style="margin-top:6px;font-size:11px">Resolves M:N between Mentor and Mentee.<br>FK to both
+                  subtypes.</div>
+              </div>
+              <div style="background:var(--surface2);border-radius:9px;padding:14px">
+                <div style="font-weight:700;color:var(--red);margin-bottom:8px">Restricted Access</div>
+                <div style="color:var(--text)">🔐 SensitiveNotes</div>
+                <div style="margin-top:6px;font-size:11px">Confidential mentor observations.<br>Access via Views +
+                  GRANT/REVOKE.</div>
+              </div>
+              <div style="background:var(--surface2);border-radius:9px;padding:14px">
+                <div style="font-weight:700;color:var(--green);margin-bottom:8px">Normalization</div>
+                <div style="color:var(--text)">1NF → 2NF → 3NF → BCNF</div>
+                <div style="margin-top:6px;font-size:11px">All tables proved to BCNF.<br>Zero anomalies; no transitive
+                  FDs.</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">🔍 Quick Query</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-outline btn-sm" onclick="quickQuery('SELECT * FROM Users')">All Users</button>
+              <button class="btn btn-outline btn-sm"
+                onclick="quickQuery('SELECT * FROM Sessions WHERE status=\\'Completed\\'')">Completed Sessions</button>
+              <button class="btn btn-outline btn-sm"
+                onclick="quickQuery('SELECT * FROM SensitiveNotes ORDER BY created_at DESC')">All Notes</button>
+              <button class="btn btn-outline btn-sm"
+                onclick="quickQuery('SELECT u.name,m.department,m.specialization FROM Mentors m JOIN Users u ON m.MentorID=u.UserID')">Mentor
+                Details</button>
+            </div>
+            <div id="quick-result" style="margin-top:14px"></div>
+          </div>
+        </div>
+
+        <!-- TABLE TABS -->
+        <div id="tab-users">
+          <div class="section-header">
+            <h2>👥 Users Table</h2>
+            <p>Supertype — all system users regardless of role.</p>
+          </div>
+          <div id="tbl-users"></div>
+        </div>
+        <div id="tab-mentors">
+          <div class="section-header">
+            <h2>🧑‍🏫 Mentors Table</h2>
+            <p>Subtype of Users — mentor-specific attributes.</p>
+          </div>
+          <div id="tbl-mentors"></div>
+        </div>
+        <div id="tab-mentees">
+          <div class="section-header">
+            <h2>🎓 Mentees Table</h2>
+            <p>Subtype of Users — student-specific attributes.</p>
+          </div>
+          <div id="tbl-mentees"></div>
+        </div>
+        <div id="tab-sessions">
+          <div class="section-header">
+            <h2>📅 Sessions Table</h2>
+            <p>Resolves M:N between Mentors and Mentees.</p>
+          </div>
+          <div id="tbl-sessions"></div>
+        </div>
+        <div id="tab-notes">
+          <div class="section-header">
+            <h2>🔐 SensitiveNotes Table</h2>
+            <p>Confidential mentor observations — restricted access.</p>
+          </div>
+          <div id="tbl-notes"></div>
+        </div>
+        <div id="tab-ec">
+          <div class="section-header">
+            <h2>📞 Emergency Contacts</h2>
+            <p>Weak Entity — Composite PK (ContactID, MenteeID).</p>
+          </div>
+          <div id="tbl-ec"></div>
+        </div>
+
+        <!-- QUERIES -->
+        <div id="tab-queries">
+          <div class="section-header">
+            <h2>⚡ Query Runner</h2>
+            <p>Run the 5 required queries or write your own SQL.</p>
+          </div>
+          <div class="preset-grid">
+            <div class="preset-btn" onclick="loadPreset(0)">
+              <div class="preset-title">Query 1 — Aggregation</div>
+              <div class="preset-desc">GROUP BY + HAVING + COUNT + AVG</div>
+            </div>
+            <div class="preset-btn" onclick="loadPreset(1)">
+              <div class="preset-title">Query 2 — Multi JOIN</div>
+              <div class="preset-desc">4-table INNER JOIN with aliases</div>
+            </div>
+            <div class="preset-btn" onclick="loadPreset(2)">
+              <div class="preset-title">Query 3 — Subquery</div>
+              <div class="preset-desc">Same result as Query 2 using subqueries</div>
+            </div>
+            <div class="preset-btn" onclick="loadPreset(3)">
+              <div class="preset-title">Query 5 — Relational Algebra SQL</div>
+              <div class="preset-desc">Priya's completed sessions + mentees</div>
+            </div>
+          </div>
+          <div class="query-editor">
+            <div class="query-toolbar">
+              <span>SQL Editor</span>
+              <button class="btn btn-primary btn-sm" onclick="runSQL()">▶ Run Query</button>
+              <button class="btn btn-outline btn-sm" onclick="clearSQL()">✕ Clear</button>
+            </div>
+            <textarea id="sql-input" placeholder="SELECT * FROM Users;"></textarea>
+          </div>
+          <div id="result-area"></div>
+        </div>
+
+        <!-- RELATIONAL ALGEBRA -->
+        <div id="tab-algebra">
+          <div class="section-header">
+            <h2>∑ Relational Algebra</h2>
+            <p>Theoretical foundation for query optimization.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">SQL Query (Query 5)</div>
+            <div class="schema-box">SELECT ume.name AS MenteeName, s.session_date, s.topic
+              FROM Users um
+              JOIN Sessions s ON um.UserID = s.MentorID
+              JOIN Users ume ON s.MenteeID = ume.UserID
+              WHERE um.name = 'Dr. Priya Sharma'
+              AND s.status = 'Completed';</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Relational Algebra Expression</div>
+            <div class="ra-box">Step 1: σ(name = 'Dr. Priya Sharma')(Users) → Mentor_M
+              Step 2: σ(status = 'Completed')(Sessions) → CompSessions
+              Step 3: Mentor_M ⋈[UserID = MentorID] CompSessions → MentorSessions
+              Step 4: MentorSessions ⋈[MenteeID = UserID] Users → FullResult
+              Step 5: π(name, session_date, topic)(FullResult) → FINAL OUTPUT
+
+              Full Expression:
+              π(name, session_date, topic) (
+              ( σ(name='Dr. Priya Sharma')(Users) ⋈[UserID=MentorID] σ(status='Completed')(Sessions) )
+              ⋈[MenteeID=UserID]
+              Users
+              )</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Why This Matters — Query Optimization</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Optimization Rule</th>
+                    <th>What Happens</th>
+                    <th>Performance Impact</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="pill pill-purple">Selection Pushdown</span></td>
+                    <td>σ applied BEFORE the join — filters Users to 1 row</td>
+                    <td>Reduces join from O(N×M) to O(1×M)</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-blue">Projection Pushdown</span></td>
+                    <td>π removes unused columns before joins</td>
+                    <td>Smaller tuples → less I/O and memory</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-green">Join Reordering</span></td>
+                    <td>Optimizer joins smallest result first</td>
+                    <td>1-row Mentor_M joined first is always cheaper</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card" style="margin-top:0">
+            <div class="card-title">▶ Run the Relational Algebra Query</div>
+            <button class="btn btn-primary btn-sm" onclick="runRA()">Execute Query 5 SQL</button>
+            <div id="ra-result" style="margin-top:14px"></div>
+          </div>
+        </div>
+
+        <!-- SCHEMA -->
+        <div id="tab-schema">
+          <div class="section-header">
+            <h2>🗂 Relational Schema</h2>
+            <p>All Primary Keys, Foreign Keys, and Constraints.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">Users (Supertype)</div>
+            <div class="schema-box">Users(
+              UserID INT PRIMARY KEY,
+              name VARCHAR(100) NOT NULL,
+              email VARCHAR(150) UNIQUE NOT NULL,
+              phone VARCHAR(20),
+              role VARCHAR(10) NOT NULL CHECK (role IN ('Mentor','Mentee','Admin'))
+              )</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Mentors (Subtype of Users)</div>
+            <div class="schema-box">Mentors(
+              MentorID INT PRIMARY KEY, ← FK → Users(UserID) ON DELETE CASCADE
+              department VARCHAR(100) NOT NULL,
+              specialization VARCHAR(150),
+              max_mentees INT NOT NULL CHECK (max_mentees >= 1)
+              )</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Mentees (Subtype of Users)</div>
+            <div class="schema-box">Mentees(
+              MenteeID INT PRIMARY KEY, ← FK → Users(UserID) ON DELETE CASCADE
+              enrollment_year INT NOT NULL,
+              program VARCHAR(100) NOT NULL,
+              GPA DECIMAL(3,2) CHECK (GPA BETWEEN 0.00 AND 4.00)
+              )</div>
+          </div>
+          <div class="card">
+            <div class="card-title">EmergencyContacts (Weak Entity)</div>
+            <div class="schema-box">EmergencyContacts(
+              ContactID INT NOT NULL, ← Partial key
+              MenteeID INT NOT NULL, ← FK → Mentees(MenteeID) ON DELETE CASCADE
+              contact_name VARCHAR(100) NOT NULL,
+              relationship VARCHAR(50) NOT NULL,
+              phone VARCHAR(20) NOT NULL,
+              PRIMARY KEY (ContactID, MenteeID) ← Composite PK
+              )</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Sessions</div>
+            <div class="schema-box">Sessions(
+              SessionID INT PRIMARY KEY,
+              MentorID INT NOT NULL, ← FK → Mentors(MentorID)
+              MenteeID INT NOT NULL, ← FK → Mentees(MenteeID)
+              session_date DATE NOT NULL,
+              duration_mins INT NOT NULL CHECK (duration_mins > 0),
+              topic VARCHAR(200) NOT NULL,
+              status VARCHAR(15) NOT NULL CHECK (status IN ('Scheduled','Completed','Cancelled'))
+              )</div>
+          </div>
+          <div class="card">
+            <div class="card-title">SensitiveNotes</div>
+            <div class="schema-box">SensitiveNotes(
+              NoteID INT PRIMARY KEY,
+              SessionID INT NOT NULL, ← FK → Sessions(SessionID)
+              MentorID INT NOT NULL, ← FK → Mentors(MentorID)
+              MenteeID INT NOT NULL, ← FK → Mentees(MenteeID)
+              note_text TEXT NOT NULL,
+              confidentiality_level VARCHAR(10) NOT NULL CHECK (confidentiality_level IN ('Low','Medium','High')),
+              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+              )</div>
+          </div>
+        </div>
+
+        <!-- NORMALIZATION -->
+        <div id="tab-norm">
+          <div class="section-header">
+            <h2>✅ Normalization Proof</h2>
+            <p>Formal proof that the schema is in 3NF and BCNF.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">Functional Dependencies</div>
+            <div class="schema-box">Users: UserID → name, email, phone, role
+              Mentors: MentorID → department, specialization, max_mentees
+              Mentees: MenteeID → enrollment_year, program, GPA
+              EmergencyContacts:(ContactID, MenteeID) → contact_name, relationship, phone
+              Sessions: SessionID → MentorID, MenteeID, session_date, duration_mins, topic, status
+              SensitiveNotes: NoteID → SessionID, MentorID, MenteeID, note_text, confidentiality_level, created_at</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Normal Form Proofs</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Normal Form</th>
+                    <th>Requirement</th>
+                    <th>Status</th>
+                    <th>Evidence</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>1NF</b></td>
+                    <td>Atomic attributes, no repeating groups, PK exists</td>
+                    <td><span class="pill pill-green">✓ Satisfied</span></td>
+                    <td>All attributes are single-valued; emergency contacts in separate table</td>
+                  </tr>
+                  <tr>
+                    <td><b>2NF</b></td>
+                    <td>1NF + no partial dependencies on composite PK</td>
+                    <td><span class="pill pill-green">✓ Satisfied</span></td>
+                    <td>EmergencyContacts: contact_name depends on full (ContactID, MenteeID); all other tables have
+                      single-column PKs</td>
+                  </tr>
+                  <tr>
+                    <td><b>3NF</b></td>
+                    <td>2NF + no transitive dependencies (non-key→non-key)</td>
+                    <td><span class="pill pill-green">✓ Satisfied</span></td>
+                    <td>No non-key attribute depends on another non-key attribute in any table; cross-table FDs handled
+                      by separate tables</td>
+                  </tr>
+                  <tr>
+                    <td><b>BCNF</b></td>
+                    <td>Every determinant of a non-trivial FD is a superkey</td>
+                    <td><span class="pill pill-green">✓ Satisfied</span></td>
+                    <td>In every table, only the PK determines non-key attributes; PK is always a superkey</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">Anomaly Prevention</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Anomaly</th>
+                    <th>Bad Design Example</th>
+                    <th>How Our Schema Prevents It</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="pill pill-red">Insertion</span></td>
+                    <td>Cannot add a Mentor without assigning a Mentee</td>
+                    <td>Mentors table is independent; insert with zero sessions</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-yellow">Update</span></td>
+                    <td>Mentor's department stored in every Session row — N updates</td>
+                    <td>Department stored once in Mentors; FK joins retrieve it everywhere</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-red">Deletion</span></td>
+                    <td>Deleting last session of a mentor deletes department info</td>
+                    <td>Mentor data persists independent of Sessions</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACID -->
+        <div id="tab-acid">
+          <div class="section-header">
+            <h2>🔒 ACID & Concurrency Control</h2>
+            <p>Transactions, isolation, and the Lost Update problem.</p>
+          </div>
+          <div class="card">
+            <div class="card-title">ACID Properties — Simultaneous Session + Note Insert</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Property</th>
+                    <th>Definition</th>
+                    <th>Application to This System</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="pill pill-purple">Atomicity</span></td>
+                    <td>All ops succeed or none</td>
+                    <td>If SensitiveNotes INSERT fails, Sessions UPDATE also rolls back — no orphaned completed session
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-blue">Consistency</span></td>
+                    <td>DB moves between valid states</td>
+                    <td>After commit: all FK, CHECK, UNIQUE constraints hold — DB is never in a constraint-violating
+                      state</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-green">Isolation</span></td>
+                    <td>Transactions appear serial</td>
+                    <td>Other mentors see either the old state or fully committed state — never partial data</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-yellow">Durability</span></td>
+                    <td>Committed changes persist</td>
+                    <td>After COMMIT, Write-Ahead Log ensures data survives power failure</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">The Lost Update Problem</div>
+            <div class="schema-box" style="color:#f87171">T1 (Priya): BEGIN
+              T2 (Arjun): BEGIN
+              T1: SELECT note_text FROM SensitiveNotes WHERE NoteID=1001; -- reads "Rahul shows..."
+              T2: SELECT note_text FROM SensitiveNotes WHERE NoteID=1001; -- reads same value
+              T1: UPDATE SensitiveNotes SET note_text='[Priya version]' WHERE NoteID=1001;
+              T2: UPDATE SensitiveNotes SET note_text='[Arjun version]' WHERE NoteID=1001;
+              T1: COMMIT; -- Priya's update lands
+              T2: COMMIT; -- Arjun OVERWRITES Priya → LOST UPDATE ANOMALY!</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Prevention Approaches</div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Approach</th>
+                    <th>Mechanism</th>
+                    <th>Best For</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="pill pill-blue">Pessimistic Locking (2PL)</span></td>
+                    <td>SELECT FOR UPDATE acquires X-Lock; T2 blocks until T1 commits</td>
+                    <td>High-contention writes; strong consistency needed</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-green">Optimistic CC</span></td>
+                    <td>Version column: UPDATE fails if version changed since read; app retries</td>
+                    <td>Low-contention; high read throughput required</td>
+                  </tr>
+                  <tr>
+                    <td><span class="pill pill-purple">MVCC (PostgreSQL)</span></td>
+                    <td>Writers create new row versions; readers see consistent snapshot</td>
+                    <td>Mixed read/write workloads; readers never block writers</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">B-Tree vs B+-Tree for SensitiveNotes.created_at</div>
+            <div class="table-wrap">
+              <table class="compare-table">
+                <thead>
+                  <tr>
+                    <th>Feature</th>
+                    <th>B-Tree</th>
+                    <th>B+-Tree (Used Here)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Data Storage</td>
+                    <td>All nodes (internal + leaf)</td>
+                    <td><span class="pill pill-green">Leaf nodes only</span></td>
+                  </tr>
+                  <tr>
+                    <td>Leaf Linkage</td>
+                    <td>Not linked</td>
+                    <td><span class="pill pill-green">Doubly-linked list</span></td>
+                  </tr>
+                  <tr>
+                    <td>Range Queries</td>
+                    <td><span class="pill pill-red">Poor — needs upward traversal</span></td>
+                    <td><span class="pill pill-green">Excellent — sequential leaf scan</span></td>
+                  </tr>
+                  <tr>
+                    <td>ORDER BY support</td>
+                    <td>Requires extra sort step</td>
+                    <td><span class="pill pill-green">Free — leaves already sorted</span></td>
+                  </tr>
+                  <tr>
+                    <td>Verdict for created_at</td>
+                    <td><span class="pill pill-red">❌ Not optimal</span></td>
+                    <td><span class="pill pill-green">✓ Optimal choice</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tab-panels -->
+    </main>
+  </div>
+
+  <div id="status">
+    <span><span class="status-dot"></span>Database: mentoring_db (SQLite In-Browser)</span>
+    <span>Tables: 6</span>
+    <span>Records: loading…</span>
+    <span>Engine: sql.js v1.10</span>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script>
+    let db;
+
+    const SCHEMA = `
+CREATE TABLE IF NOT EXISTS Users(UserID INT PRIMARY KEY,name TEXT NOT NULL,email TEXT UNIQUE NOT NULL,phone TEXT,role TEXT NOT NULL CHECK(role IN('Mentor','Mentee','Admin')));
+CREATE TABLE IF NOT EXISTS Mentors(MentorID INT PRIMARY KEY,department TEXT NOT NULL,specialization TEXT,max_mentees INT NOT NULL CHECK(max_mentees>=1),FOREIGN KEY(MentorID) REFERENCES Users(UserID));
+CREATE TABLE IF NOT EXISTS Mentees(MenteeID INT PRIMARY KEY,enrollment_year INT NOT NULL,program TEXT NOT NULL,GPA REAL CHECK(GPA BETWEEN 0.0 AND 4.0),FOREIGN KEY(MenteeID) REFERENCES Users(UserID));
+CREATE TABLE IF NOT EXISTS EmergencyContacts(ContactID INT NOT NULL,MenteeID INT NOT NULL,contact_name TEXT NOT NULL,relationship TEXT NOT NULL,phone TEXT NOT NULL,PRIMARY KEY(ContactID,MenteeID),FOREIGN KEY(MenteeID) REFERENCES Mentees(MenteeID));
+CREATE TABLE IF NOT EXISTS Sessions(SessionID INT PRIMARY KEY,MentorID INT NOT NULL,MenteeID INT NOT NULL,session_date TEXT NOT NULL,duration_mins INT NOT NULL CHECK(duration_mins>0),topic TEXT NOT NULL,status TEXT NOT NULL CHECK(status IN('Scheduled','Completed','Cancelled')),FOREIGN KEY(MentorID) REFERENCES Mentors(MentorID),FOREIGN KEY(MenteeID) REFERENCES Mentees(MenteeID));
+CREATE TABLE IF NOT EXISTS SensitiveNotes(NoteID INT PRIMARY KEY,SessionID INT NOT NULL,MentorID INT NOT NULL,MenteeID INT NOT NULL,note_text TEXT NOT NULL,confidentiality_level TEXT NOT NULL CHECK(confidentiality_level IN('Low','Medium','High')),created_at TEXT NOT NULL,FOREIGN KEY(SessionID) REFERENCES Sessions(SessionID),FOREIGN KEY(MentorID) REFERENCES Mentors(MentorID),FOREIGN KEY(MenteeID) REFERENCES Mentees(MenteeID));
+`;
+
+    const DATA = `
+INSERT INTO Users VALUES(1,'Dr. Priya Sharma','priya.sharma@uni.edu','9876543210','Mentor');
+INSERT INTO Users VALUES(2,'Prof. Arjun Mehta','arjun.mehta@uni.edu','9876543211','Mentor');
+INSERT INTO Users VALUES(3,'Dr. Neha Kapoor','neha.kapoor@uni.edu','9876543212','Mentor');
+INSERT INTO Users VALUES(4,'Rahul Gupta','rahul.gupta@student.edu','9876543220','Mentee');
+INSERT INTO Users VALUES(5,'Deepali Verma','deepali.verma@student.edu','9876543221','Mentee');
+INSERT INTO Users VALUES(6,'Aakash Singh','aakash.singh@student.edu','9876543222','Mentee');
+INSERT INTO Users VALUES(7,'Admin Ravi Kumar','ravi.admin@uni.edu','9876543200','Admin');
+INSERT INTO Mentors VALUES(1,'Computer Science','Machine Learning & AI',5);
+INSERT INTO Mentors VALUES(2,'Information Systems','Database Systems & Security',4);
+INSERT INTO Mentors VALUES(3,'Software Engineering','Agile & DevOps',3);
+INSERT INTO Mentees VALUES(4,2022,'B.Tech Computer Science',3.75);
+INSERT INTO Mentees VALUES(5,2022,'B.Tech Computer Science',3.20);
+INSERT INTO Mentees VALUES(6,2023,'M.Tech Information Systems',3.50);
+INSERT INTO EmergencyContacts VALUES(1,4,'Sunita Gupta','Mother','9111112222');
+INSERT INTO EmergencyContacts VALUES(1,5,'Vikram Verma','Father','9333334444');
+INSERT INTO EmergencyContacts VALUES(1,6,'Meera Singh','Guardian','9555556666');
+INSERT INTO Sessions VALUES(101,1,4,'2024-01-10',60,'Research Methodology','Completed');
+INSERT INTO Sessions VALUES(102,1,4,'2024-02-14',45,'Literature Review Techniques','Completed');
+INSERT INTO Sessions VALUES(103,1,5,'2024-02-20',60,'Python for Data Science','Completed');
+INSERT INTO Sessions VALUES(104,1,5,'2024-03-05',90,'ML Model Evaluation','Completed');
+INSERT INTO Sessions VALUES(105,2,4,'2024-03-12',60,'SQL & Database Design','Completed');
+INSERT INTO Sessions VALUES(106,2,6,'2024-03-18',75,'Normalization & ACID','Completed');
+INSERT INTO Sessions VALUES(107,3,5,'2024-03-25',60,'Agile Sprint Planning','Scheduled');
+INSERT INTO Sessions VALUES(108,3,6,'2024-04-01',45,'CI/CD Pipelines','Completed');
+INSERT INTO SensitiveNotes VALUES(1001,101,1,4,'Rahul shows strong analytical skills but struggles with academic writing. Recommend writing workshop.','Medium','2024-01-10 15:00:00');
+INSERT INTO SensitiveNotes VALUES(1002,102,1,4,'Significant improvement in writing after the workshop. Ready to begin independent literature review.','Low','2024-02-14 11:00:00');
+INSERT INTO SensitiveNotes VALUES(1003,103,1,5,'Deepali disclosed anxiety about end-semester exams. Referred to university counseling services.','High','2024-02-20 14:30:00');
+INSERT INTO SensitiveNotes VALUES(1004,105,2,4,'Rahul has a solid grasp of ERDs but confuses 2NF and 3NF. Assigned extra normalization exercises.','Low','2024-03-12 10:00:00');
+INSERT INTO SensitiveNotes VALUES(1005,106,2,6,'Aakash is performing excellently. Suggested applying for the research assistantship in the DB Lab.','Medium','2024-03-18 16:00:00');
+`;
+
+    const PRESETS = [
+      `-- Query 1: Mentors with more than 3 completed sessions
+-- Demonstrates: SELECT, WHERE, COUNT, AVG, GROUP BY, HAVING
+SELECT m.MentorID, u.name AS MentorName, m.department,
+  COUNT(s.SessionID) AS TotalCompletedSessions,
+  ROUND(AVG(s.duration_mins),2) AS AvgDuration_mins
+FROM Mentors m
+JOIN Users u ON m.MentorID=u.UserID
+JOIN Sessions s ON m.MentorID=s.MentorID
+WHERE s.status='Completed'
+GROUP BY m.MentorID,u.name,m.department
+HAVING COUNT(s.SessionID)>3;`,
+
+      `-- Query 2: Full SensitiveNotes details via 4-table JOIN
+SELECT sn.NoteID, um.name AS AuthorMentor, ume.name AS SubjectMentee,
+  s.session_date, s.topic, sn.confidentiality_level, sn.note_text, sn.created_at
+FROM SensitiveNotes sn
+INNER JOIN Sessions s   ON sn.SessionID=s.SessionID
+INNER JOIN Users    um  ON sn.MentorID=um.UserID
+INNER JOIN Users    ume ON sn.MenteeID=ume.UserID
+ORDER BY sn.created_at DESC;`,
+
+      `-- Query 3: Same result as Query 2 using CORRELATED SUBQUERIES
+SELECT sn.NoteID,
+  (SELECT u.name FROM Users u WHERE u.UserID=sn.MentorID) AS AuthorMentor,
+  (SELECT u.name FROM Users u WHERE u.UserID=sn.MenteeID) AS SubjectMentee,
+  (SELECT s.session_date FROM Sessions s WHERE s.SessionID=sn.SessionID) AS session_date,
+  (SELECT s.topic FROM Sessions s WHERE s.SessionID=sn.SessionID) AS topic,
+  sn.confidentiality_level, sn.note_text, sn.created_at
+FROM SensitiveNotes sn
+ORDER BY sn.created_at DESC;`,
+
+      `-- Query 5: Relational Algebra SQL — Priya's mentees in completed sessions
+-- RA: π(name,session_date,topic)(σ(name='Dr. Priya Sharma')(Users) ⋈ σ(status='Completed')(Sessions) ⋈ Users)
+SELECT ume.name AS MenteeName, s.session_date, s.topic
+FROM Users um
+JOIN Sessions s   ON um.UserID=s.MentorID
+JOIN Users    ume ON s.MenteeID=ume.UserID
+WHERE um.name='Dr. Priya Sharma'
+AND   s.status='Completed';`
+    ];
+
+    function resultToHTML(res) {
+      if (!res || res.length === 0) return '<p style="color:var(--muted);font-size:13px;padding:10px">No results returned.</p>';
+      const cols = res[0].columns; const rows = res[0].values;
+      let h = `<div class="result-info"><span class="result-badge result-ok">✓ ${rows.length} row${rows.length !== 1 ? 's' : ''} returned</span></div>`;
+      h += `<div class="table-wrap"><table><thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}</tr></thead><tbody>`;
+      rows.forEach(r => {
+        h += `<tr>${r.map((v, i) => {
+          let cls = '';
+          if (cols[i] === 'role' || cols[i] === 'status' || cols[i] === 'confidentiality_level') {
+            const map = { Mentor: 'pill-purple', Mentee: 'pill-blue', Admin: 'pill-yellow', Completed: 'pill-green', Scheduled: 'pill-blue', Cancelled: 'pill-red', High: 'pill-red', Medium: 'pill-yellow', Low: 'pill-green' };
+            cls = map[v] || '';
+            if (cls) return `<td><span class="pill ${cls}">${v}</span></td>`;
+          }
+          return `<td title="${v}">${v === null ? '<span style="color:var(--muted)">NULL</span>' : v}</td>`;
+        }).join('')}</tr>`;
+      });
+      h += `</tbody></table></div>`;
+      return h;
+    }
+
+    function runSQL() {
+      const sql = document.getElementById('sql-input').value.trim();
+      if (!sql) { document.getElementById('result-area').innerHTML = '<p style="color:var(--muted);font-size:13px">Please enter a SQL query.</p>'; return; }
+      try {
+        const res = db.exec(sql);
+        document.getElementById('result-area').innerHTML = resultToHTML(res);
+      } catch (e) {
+        document.getElementById('result-area').innerHTML = `<div class="result-info"><span class="result-badge result-err">✗ Error</span></div><div style="background:#1a0a0a;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red)">${e.message}</div>`;
+      }
+    }
+
+    function clearSQL() { document.getElementById('sql-input').value = ''; document.getElementById('result-area').innerHTML = ''; }
+    function loadPreset(i) { document.getElementById('sql-input').value = PRESETS[i]; document.getElementById('result-area').innerHTML = ''; showTab('tab-queries', null); }
+
+    function quickQuery(sql) {
+      try {
+        const res = db.exec(sql);
+        document.getElementById('quick-result').innerHTML = resultToHTML(res);
+      } catch (e) { document.getElementById('quick-result').innerHTML = `<span style="color:var(--red);font-size:12px">${e.message}</span>`; }
+    }
+
+    function runRA() {
+      const sql = `SELECT ume.name AS MenteeName, s.session_date, s.topic FROM Users um JOIN Sessions s ON um.UserID=s.MentorID JOIN Users ume ON s.MenteeID=ume.UserID WHERE um.name='Dr. Priya Sharma' AND s.status='Completed'`;
+      try { const res = db.exec(sql); document.getElementById('ra-result').innerHTML = resultToHTML(res); }
+      catch (e) { document.getElementById('ra-result').innerHTML = `<span style="color:var(--red)">${e.message}</span>`; }
+    }
+
+    function showTab(id, el) {
+      document.querySelectorAll('.tab-panels>div').forEach(d => d.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+      loadTableIfNeeded(id);
+    }
+
+    function loadTableIfNeeded(id) {
+      const map = {
+        'tab-users': { sql: 'SELECT * FROM Users', target: 'tbl-users' },
+        'tab-mentors': { sql: 'SELECT m.*,u.name,u.email FROM Mentors m JOIN Users u ON m.MentorID=u.UserID', target: 'tbl-mentors' },
+        'tab-mentees': { sql: 'SELECT m.*,u.name,u.email FROM Mentees m JOIN Users u ON m.MenteeID=u.UserID', target: 'tbl-mentees' },
+        'tab-sessions': { sql: 'SELECT s.*,um.name AS MentorName,ume.name AS MenteeName FROM Sessions s JOIN Users um ON s.MentorID=um.UserID JOIN Users ume ON s.MenteeID=ume.UserID', target: 'tbl-sessions' },
+        'tab-notes': { sql: 'SELECT sn.*,um.name AS Mentor,ume.name AS Mentee FROM SensitiveNotes sn JOIN Users um ON sn.MentorID=um.UserID JOIN Users ume ON sn.MenteeID=ume.UserID ORDER BY sn.created_at DESC', target: 'tbl-notes' },
+        'tab-ec': { sql: 'SELECT ec.*,u.name AS MenteeName FROM EmergencyContacts ec JOIN Users u ON ec.MenteeID=u.UserID', target: 'tbl-ec' },
+      };
+      if (map[id]) {
+        const t = document.getElementById(map[id].target);
+        if (t && t.innerHTML.trim() === '') {
+          try { const res = db.exec(map[id].sql); t.innerHTML = resultToHTML(res); } catch (e) { t.innerHTML = `<span style="color:var(--red)">${e.message}</span>`; }
+        }
+      }
+    }
+
+    function updateStats() {
+      const tables = [
+        { label: 'Users', sql: 'SELECT COUNT(*) FROM Users', emoji: '👥' },
+        { label: 'Mentors', sql: 'SELECT COUNT(*) FROM Mentors', emoji: '🧑‍🏫' },
+        { label: 'Mentees', sql: 'SELECT COUNT(*) FROM Mentees', emoji: '🎓' },
+        { label: 'Sessions', sql: 'SELECT COUNT(*) FROM Sessions', emoji: '📅' },
+        { label: 'Notes', sql: 'SELECT COUNT(*) FROM SensitiveNotes', emoji: '🔐' },
+        { label: 'Contacts', sql: 'SELECT COUNT(*) FROM EmergencyContacts', emoji: '📞' },
+      ];
+      let total = 0;
+      let html = tables.map(t => {
+        const n = db.exec(t.sql)[0].values[0][0];
+        total += n;
+        return `<div class="stat"><div style="font-size:22px;margin-bottom:4px">${t.emoji}</div><div class="stat-num">${n}</div><div class="stat-label">${t.label}</div></div>`;
+      }).join('');
+      document.getElementById('stats-row').innerHTML = html;
+      document.getElementById('status').innerHTML = `<span><span class="status-dot"></span>Database: mentoring_db (SQLite In-Browser)</span><span>Tables: 6</span><span>Total Records: ${total}</span><span>Engine: sql.js v1.10</span>`;
+    }
+
+    // INIT
+    initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}` }).then(SQL => {
+      db = new SQL.Database();
+      db.run(SCHEMA);
+      db.run(DATA);
+      document.getElementById('loading').style.display = 'none';
+      updateStats();
+    }).catch(e => {
+      document.getElementById('loading').innerHTML = `<p style="color:var(--red)">Failed to load SQL engine: ${e.message}</p>`;
+    });
+
+    document.getElementById('sql-input').addEventListener('keydown', function (e) {
+      if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); runSQL(); }
+    });
+  </script>
+</body>
+
+</html>
