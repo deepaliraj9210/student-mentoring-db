@@ -1,10 +1,33 @@
-# Student Mentoring DB Project
+# 🎓 STUDENT MENTORING DB DASHBOARD
 
-This is a student mentoring dashboard project.
+### ✨ Simple • Clean • Interactive Web Project
 
-**Live Demo:** [Click here to view project](https://student-mentoring-db-dashboard.vercel.app/)
+---
 
-## Features
-- Dashboard to manage students and mentors
-- SQL query runner
-- View and track student data
+## 🚀 LIVE PROJECT
+
+### 🔗 Live Demo (Vercel)
+👉 https://student-mentoring-db-dashboard.vercel.app/
+
+### 🌐 GitHub Pages
+👉 https://deepaliraj9210.github.io/student-mentoring-db/
+
+---
+
+## 💻 TECH USED
+
+### 🧩 HTML  
+### 🎨 CSS  
+### ⚙️ JavaScript  
+
+---
+
+## ⭐ PROJECT PREVIEW
+
+### 👉 Click the links above to explore the project
+
+---
+
+## 👩‍💻 AUTHOR
+
+### Deepali Raj
